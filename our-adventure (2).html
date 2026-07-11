@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Our Adventure ❤️</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky1:#7f9bef; --sky2:#a9c1f5;
+    --grass:#4f9e8c; --grass-dark:#3a7d6e;
+    --brick:#c17a3f; --brick-dark:#8a4a1f; --brick-line:#5c2f12;
+    --gold:#f4c95d; --heart:#ef6f8e; --heart-dark:#d84f72;
+    --plum:#2f2650; --cream:#fff8ed; --cream-dark:#f0e3cd;
+    font-family:'Quicksand',-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#111;color:var(--plum);user-select:none;-webkit-tap-highlight-color:transparent;}
+  #app{position:relative;width:100vw;height:100vh;overflow:hidden;}
+  .pixel{font-family:'Press Start 2P',monospace;letter-spacing:1px;}
+  .scene{position:absolute;inset:0;display:none;overflow:hidden;}
+  .scene.active{display:block;}
+
+  /* ---------- LANDING ---------- */
+  #scene-landing{background:linear-gradient(180deg,var(--sky1),var(--sky2) 60%,#dff3ff);}
+  .cloud{position:absolute;background:#fff;opacity:.95;box-shadow:inset 0 -7px 0 -3px #bfe6ff;
+    clip-path:polygon(8% 100%,8% 62%,0% 62%,0% 30%,20% 30%,20% 8%,40% 8%,40% 0%,62% 0%,62% 8%,82% 8%,82% 30%,100% 30%,100% 62%,92% 62%,92% 100%);}
+  .lcloud1{width:110px;height:38px;top:12%;left:8%;}
+  .lcloud2{width:80px;height:30px;top:22%;right:12%;}
+  .land-hills{position:absolute;bottom:0;left:0;right:0;height:38%;}
+  .hillL{position:absolute;bottom:0;width:50%;height:100%;background:var(--grass);left:-10%;box-shadow:inset 0 3px 0 -1px #2d6759;
+    clip-path:polygon(0% 100%,0% 58%,14% 58%,14% 42%,28% 42%,28% 26%,42% 26%,42% 10%,56% 10%,56% 26%,70% 26%,70% 42%,84% 42%,84% 58%,100% 58%,100% 100%);}
+  .hillR{position:absolute;bottom:0;width:60%;height:80%;background:var(--grass-dark);right:-15%;box-shadow:inset 0 3px 0 -1px #24544a;
+    clip-path:polygon(0% 100%,0% 62%,12% 62%,12% 46%,24% 46%,24% 30%,38% 30%,38% 14%,50% 14%,50% 0%,62% 14%,62% 30%,76% 30%,76% 46%,88% 46%,88% 62%,100% 62%,100% 100%);}
+  .brick-ground{position:absolute;left:0;right:0;bottom:0;height:14%;background:
+    linear-gradient(var(--brick-line),var(--brick-line) 3px, transparent 3px),
+    repeating-linear-gradient(90deg, var(--brick-line) 0 3px, transparent 3px 62px),
+    var(--brick);
+    border-top:5px solid var(--brick-dark);
+  }
+  .land-content{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:20px;}
+  .logo{font-size:clamp(26px,7vw,50px);color:#fff;text-shadow:4px 4px 0 var(--brick-dark);line-height:1.5;}
+  .sub{font-size:clamp(11px,2.6vw,15px);background:var(--cream);border:3px solid var(--brick-dark);padding:10px 18px;border-radius:12px;box-shadow:0 5px 0 var(--brick-dark);}
+  .start-btn{font-family:'Press Start 2P',monospace;font-size:clamp(12px,3vw,15px);color:#fff;background:var(--heart-dark);border:none;border-bottom:5px solid #a83b58;padding:16px 28px;border-radius:12px;cursor:pointer;animation:bounceBtn 1.8s ease-in-out infinite;}
+  @keyframes bounceBtn{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+  .hint{font-size:11px;color:#fff;opacity:.85;max-width:280px;}
+
+  /* ---------- HUD / buttons ---------- */
+  .icon-btn{position:absolute;top:12px;width:40px;height:40px;border-radius:50%;background:var(--cream);border:2px solid var(--brick-dark);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;box-shadow:0 3px 0 var(--brick-dark);z-index:40;}
+  .btn-mute{right:12px;} .btn-pause{left:12px;} .btn-map{right:60px;}
+  .hud-top{position:absolute;top:0;left:0;right:0;z-index:35;display:flex;justify-content:center;padding:10px 110px;}
+  .love-meter{background:var(--cream);border:3px solid var(--brick-dark);border-radius:20px;padding:6px 14px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;box-shadow:0 3px 0 var(--brick-dark);}
+  .love-meter .bar{width:100px;height:11px;background:var(--cream-dark);border-radius:8px;overflow:hidden;border:2px solid var(--brick-dark);}
+  .love-meter .fill{height:100%;background:linear-gradient(90deg,var(--heart),var(--gold));width:0%;transition:width .4s ease;}
+  .chapter-tag{position:absolute;top:56px;left:50%;transform:translateX(-50%);background:var(--plum);color:#fff;padding:5px 14px;border-radius:16px;font-size:11px;font-weight:700;z-index:35;white-space:nowrap;}
+
+  /* ---------- WORLD ---------- */
+  #scene-world{background:#111;}
+  .sky-fixed{position:absolute;inset:0;background:linear-gradient(180deg,var(--sky1),var(--sky2) 65%,#dff3ff);transition:filter .6s ease;}
+  .tint{position:absolute;inset:0;opacity:0;transition:opacity 1s ease;pointer-events:none;}
+  .tint.rain{background:linear-gradient(180deg,#5b6b82,#8ea3b8);}
+  .tint.night{background:linear-gradient(180deg,#161233,#2c2455);}
+  .tint.sunset{background:linear-gradient(180deg,#ff9a76,#ffcf9b);}
+  .tint.warm{background:linear-gradient(180deg,#ffe2a6,#ffd08a);}
+  .tint.beach{background:linear-gradient(180deg,#5fd0e6,#bff2ff);}
+  .tint.on{opacity:.55;}
+
+  .rain-layer{position:absolute;inset:0;opacity:0;transition:opacity .8s ease;pointer-events:none;overflow:hidden;}
+  .rain-layer.on{opacity:1;}
+  .drop{position:absolute;top:-4%;width:2px;height:16px;background:rgba(255,255,255,.55);animation:dropFall linear infinite;}
+  @keyframes dropFall{to{transform:translateY(110vh);}}
+
+  .world-far{position:absolute;bottom:14%;left:0;height:42%;will-change:transform;}
+  .world-near{position:absolute;bottom:0;left:0;height:100%;will-change:transform;}
+  .hill{position:absolute;bottom:0;box-shadow:inset 0 3px 0 -1px rgba(0,0,0,.25);
+    clip-path:polygon(0% 100%,0% 60%,14% 60%,14% 42%,28% 42%,28% 24%,42% 24%,42% 8%,58% 8%,58% 24%,72% 24%,72% 42%,86% 42%,86% 60%,100% 60%,100% 100%);}
+  .cloud-world{position:absolute;background:#fff;opacity:.95;box-shadow:inset 0 -6px 0 -3px #bfe6ff;
+    clip-path:polygon(8% 100%,8% 62%,0% 62%,0% 30%,20% 30%,20% 8%,40% 8%,40% 0%,62% 0%,62% 8%,82% 8%,82% 30%,100% 30%,100% 62%,92% 62%,92% 100%);}
+
+  .ground-band{position:absolute;left:0;bottom:0;height:14%;background:
+    linear-gradient(var(--brick-line),var(--brick-line) 3px, transparent 3px),
+    repeating-linear-gradient(90deg, var(--brick-line) 0 3px, transparent 3px 62px),
+    var(--brick);
+    border-top:5px solid var(--brick-dark);
+  }
+
+  .decor{position:absolute;bottom:14%;font-size:40px;}
+  .decor.small{font-size:26px;}
+  .flag{position:absolute;bottom:14%;display:flex;flex-direction:column;align-items:center;cursor:pointer;z-index:5;}
+  .flag .pole{width:5px;height:120px;background:var(--brick-dark);}
+  .flag .banner{position:absolute;top:0;left:5px;background:var(--heart);color:#fff;font-size:22px;padding:6px 8px;border-radius:0 8px 8px 0;box-shadow:0 2px 0 var(--heart-dark);animation:flagWave 2s ease-in-out infinite;}
+  @keyframes flagWave{0%,100%{transform:rotate(0deg);}50%{transform:rotate(-6deg);}}
+  .flag.visited .banner{background:var(--gold);}
+  .flag .flabel{position:absolute;bottom:-26px;background:var(--cream);border:2px solid var(--brick-dark);border-radius:8px;padding:2px 8px;font-size:10px;font-weight:700;white-space:nowrap;}
+  .castle-flag .banner{font-size:30px;}
+
+  .collectible{position:absolute;bottom:20%;font-size:24px;cursor:pointer;animation:bobFloat 2s ease-in-out infinite;z-index:4;transition:transform .2s,opacity .2s;}
+  @keyframes bobFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+  .collectible.gone{transform:scale(0) translateY(-30px)!important;opacity:0;pointer-events:none;}
+
+  .player{position:absolute;bottom:14%;z-index:10;display:flex;align-items:flex-end;transform-origin:bottom center;transition:transform .1s linear;}
+  .player.walk{animation:walkBob .3s ease-in-out infinite;}
+  @keyframes walkBob{0%,100%{transform:translateY(0) scaleX(var(--dir,1));}50%{transform:translateY(-4px) scaleX(var(--dir,1));}}
+  .player.jump{animation:jumpArc .5s ease-out;}
+  @keyframes jumpArc{0%{transform:translateY(0) scaleX(var(--dir,1));}40%{transform:translateY(-46px) scaleX(var(--dir,1));}100%{transform:translateY(0) scaleX(var(--dir,1));}}
+
+  .char-svg{width:64px;height:auto;display:block;image-rendering:pixelated;shape-rendering:crispEdges;filter:drop-shadow(0 2px 1px rgba(0,0,0,.3));}
+  .her-svg{margin-left:-10px;}
+  .player.walk .leg-l{animation:legSwingL .3s steps(2) infinite;transform-origin:6.5px 14px;}
+  .player.walk .leg-r{animation:legSwingR .3s steps(2) infinite;transform-origin:10.5px 14px;}
+  @keyframes legSwingL{0%,100%{transform:rotate(14deg);}50%{transform:rotate(-14deg);}}
+  @keyframes legSwingR{0%,100%{transform:rotate(-14deg);}50%{transform:rotate(14deg);}}
+  .player.walk .dress{animation:dressSwish .3s ease-in-out infinite;transform-origin:9px 15px;}
+  @keyframes dressSwish{0%,100%{transform:skewX(4deg);}50%{transform:skewX(-4deg);}}
+
+  .bubble{position:absolute;bottom:26%;background:#fff;border:3px solid var(--plum);border-radius:12px;padding:6px 10px;font-size:11px;font-weight:700;max-width:170px;text-align:center;opacity:0;transition:opacity .35s ease;z-index:11;}
+  .bubble.show{opacity:1;}
+  .bubble:after{content:'';position:absolute;bottom:-9px;left:24px;border:7px solid transparent;border-top-color:var(--plum);}
+
+  /* touch controls */
+  .touch-controls{position:absolute;bottom:16px;left:0;right:0;display:flex;justify-content:space-between;padding:0 16px;z-index:40;pointer-events:none;}
+  .dpad{display:flex;gap:8px;pointer-events:auto;}
+  .tbtn{width:56px;height:56px;border-radius:50%;background:rgba(255,248,237,.9);border:3px solid var(--brick-dark);font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 0 var(--brick-dark);cursor:pointer;}
+  .tbtn:active{transform:translateY(2px);box-shadow:none;}
+  .jump-btn{pointer-events:auto;}
+
+  /* puncture vignette */
+  .vignette-overlay{position:absolute;inset:0;background:rgba(20,14,36,.55);display:none;align-items:flex-end;justify-content:center;z-index:60;padding-bottom:30%;}
+  .vignette-overlay.show{display:flex;}
+  .vignette-box{background:var(--cream);border:4px solid var(--brick-dark);border-radius:16px;padding:16px 20px;max-width:300px;text-align:center;box-shadow:0 6px 0 var(--brick-dark);animation:cardPop .4s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes cardPop{from{transform:scale(.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+  .vignette-box .v-emoji{font-size:34px;}
+  .vignette-box p{font-size:13px;margin:8px 0;}
+
+  /* ---------- MEMORY CARD ---------- */
+  .overlay{position:absolute;inset:0;background:rgba(20,14,36,.75);display:none;align-items:center;justify-content:center;z-index:100;padding:14px;}
+  .overlay.show{display:flex;}
+  .memory-card{background:var(--cream);border-radius:18px;border:4px solid var(--brick-dark);max-width:440px;width:100%;max-height:90vh;overflow-y:auto;padding:20px;box-shadow:0 10px 0 var(--brick-dark);animation:cardPop .4s cubic-bezier(.34,1.56,.64,1);}
+  .m-date{font-size:11px;font-weight:700;color:var(--heart-dark);}
+  .m-title{font-size:19px;font-weight:700;margin:3px 0 8px;}
+  .m-story{font-size:14px;line-height:1.55;margin-bottom:10px;}
+  .m-tag{display:inline-block;background:#fff;border:2px solid var(--brick-dark);border-radius:10px;padding:4px 10px;font-size:11px;margin:0 6px 6px 0;font-weight:700;}
+  .upload-row{display:flex;gap:8px;margin:12px 0 8px;flex-wrap:wrap;}
+  .upload-btn{font-size:11px;font-weight:700;background:#fff;border:2px dashed var(--brick-dark);border-radius:10px;padding:8px 12px;cursor:pointer;}
+  .hidden-file{display:none;}
+  .media-grid{display:flex;gap:8px;overflow-x:auto;margin-bottom:10px;padding-bottom:4px;}
+  .media-item{flex:0 0 auto;width:110px;cursor:pointer;position:relative;}
+  .media-item img,.media-item video{width:110px;height:90px;object-fit:cover;border-radius:10px;border:2px solid var(--brick-dark);}
+  .media-remove{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:var(--heart-dark);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #fff;box-shadow:0 2px 0 rgba(0,0,0,.2);}
+  #lightboxMediaWrap img,#lightboxMediaWrap video{max-width:92vw;max-height:78vh;border-radius:12px;display:block;}
+  .media-empty{width:100%;padding:14px;text-align:center;font-size:12px;color:#8a7d63;background:#fff;border:2px dashed var(--brick-dark);border-radius:10px;}
+  .continue-btn{margin-top:8px;width:100%;font-family:'Press Start 2P',monospace;font-size:11px;background:var(--heart-dark);color:#fff;border:none;border-bottom:4px solid #a83b58;padding:13px;border-radius:10px;cursor:pointer;}
+  .save-note{font-size:10px;color:#8a7d63;margin-top:6px;}
+  .toast{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:var(--plum);color:#fff;padding:12px 18px;border-radius:12px;font-size:12px;max-width:320px;text-align:center;z-index:300;box-shadow:0 4px 0 rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .3s ease;}
+  .toast.show{opacity:1;}
+
+  /* pause / chapter select */
+  .pause-panel{background:var(--plum);color:#fff;padding:22px;border-radius:16px;width:100%;max-width:320px;max-height:82vh;overflow-y:auto;text-align:center;}
+  .pause-panel h3{font-family:'Press Start 2P',monospace;font-size:13px;margin-bottom:14px;}
+  .menu-btn{display:block;width:100%;margin-bottom:8px;padding:11px;border-radius:10px;border:none;background:var(--cream);color:var(--plum);font-weight:700;cursor:pointer;font-size:13px;}
+  .chapter-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:10px;padding:8px 10px;margin-bottom:6px;text-align:left;cursor:pointer;}
+  .chapter-row .cbadge{width:30px;height:30px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;flex:0 0 auto;}
+  .chapter-row.locked{opacity:.4;cursor:not-allowed;}
+  .chapter-row .ctitle{font-size:12px;font-weight:700;}
+  .chapter-row .cdate{font-size:10px;opacity:.7;}
+
+  /* surprise + gift */
+  .surprise-overlay{position:absolute;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(20,14,36,.85);}
+  .surprise-overlay.show{display:flex;}
+  .surprise-box{text-align:center;color:#fff;max-width:320px;}
+  .surprise-box h2{font-family:'Press Start 2P',monospace;font-size:15px;color:var(--gold);text-shadow:2px 2px 0 var(--brick-dark);}
+  .confetti-piece{position:absolute;top:-10px;width:8px;height:14px;animation:confettiFall linear forwards;}
+  @keyframes confettiFall{to{transform:translateY(110vh) rotate(400deg);opacity:.3;}}
+  .gift-popup{background:var(--cream);border:4px solid var(--gold);border-radius:16px;padding:22px;text-align:center;max-width:300px;}
+  .gift-popup .g-emoji{font-size:46px;}
+  .small-btn{font-family:'Press Start 2P',monospace;font-size:10px;background:var(--cream);border:2px solid var(--brick-dark);border-radius:8px;padding:8px 14px;cursor:pointer;box-shadow:0 3px 0 var(--brick-dark);}
+
+  /* ---------- ENDING ---------- */
+  #scene-ending{background:linear-gradient(180deg,#161233,#2c2455);}
+  .stars{position:absolute;inset:0;}
+  .star{position:absolute;background:#fff;border-radius:50%;animation:twinkle 2.4s ease-in-out infinite;}
+  @keyframes twinkle{0%,100%{opacity:.2;}50%{opacity:1;}}
+  .ending-content{position:relative;z-index:5;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px;padding:20px;}
+  .ending-dialogue{color:#fff;font-size:14px;background:rgba(255,255,255,.08);padding:12px 18px;border-radius:14px;min-height:22px;max-width:320px;}
+  .firework{position:absolute;width:6px;height:6px;border-radius:50%;animation:fireworkPop 1.2s ease-out forwards;}
+  @keyframes fireworkPop{0%{transform:scale(0);opacity:1;}100%{transform:scale(18);opacity:0;}}
+  .credits{position:absolute;bottom:0;left:0;right:0;color:#fff;text-align:center;font-size:12px;line-height:2.1;padding:20px;animation:creditScroll 20s linear infinite;opacity:0;}
+  .credits.show{opacity:1;}
+  @keyframes creditScroll{from{transform:translateY(100%);}to{transform:translateY(-260%);}}
+
+  @media(max-width:480px){
+    .char-svg{width:32px;}
+    .decor{font-size:30px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- LANDING -->
+  <div class="scene active" id="scene-landing">
+    <div class="cloud lcloud1"></div><div class="cloud lcloud2"></div>
+    <div class="land-hills"><div class="hillL"></div><div class="hillR"></div></div>
+    <div class="brick-ground"></div>
+    <button class="icon-btn btn-mute" id="muteBtnLand">🔊</button>
+    <div class="land-content">
+      <div class="logo pixel">OUR<br>ADVENTURE</div>
+      <div class="sub">Press Start, Ashiiii ❤️</div>
+      <button class="start-btn" id="startBtn">▶ START</button>
+      <div class="hint">Use ← → to walk, ↑ / Space to jump. Walk to each flag to relive a memory.</div>
+    </div>
+  </div>
+
+  <!-- WORLD -->
+  <div class="scene" id="scene-world">
+    <div class="sky-fixed"></div>
+    <div class="tint" id="tintLayer"></div>
+    <div class="rain-layer" id="rainLayer"></div>
+    <div class="world-far" id="worldFar"></div>
+    <div class="world-near" id="worldNear"></div>
+    <div class="player walk" id="player" style="--dir:1;">
+      <svg class="char-svg him-svg" viewBox="0 0 16 20" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="0" width="6" height="1" fill="#2e7d5c"></rect>
+        <rect x="4" y="1" width="8" height="1" fill="#2e7d5c"></rect>
+        <rect x="3" y="2" width="10" height="1" fill="#1f5c44"></rect>
+        <rect x="3" y="3" width="2" height="3" fill="#6b4326"></rect>
+        <rect x="5" y="3" width="8" height="5" fill="#f2c39a"></rect>
+        <rect x="10" y="5" width="1" height="1" fill="#2f2650"></rect>
+        <rect x="7" y="7" width="3" height="1" fill="#c98a68"></rect>
+        <rect x="4" y="8" width="10" height="2" fill="#2f8f8a"></rect>
+        <rect x="2" y="8" width="2" height="4" fill="#2f8f8a"></rect>
+        <rect x="12" y="8" width="2" height="4" fill="#2f8f8a"></rect>
+        <rect x="5" y="8" width="1" height="2" fill="#2c3e6b"></rect>
+        <rect x="10" y="8" width="1" height="2" fill="#2c3e6b"></rect>
+        <rect x="2" y="12" width="2" height="2" fill="#f2c39a"></rect>
+        <rect x="12" y="12" width="2" height="2" fill="#f2c39a"></rect>
+        <rect x="4" y="10" width="10" height="4" fill="#2c3e6b"></rect>
+        <rect x="6" y="11" width="1" height="1" fill="#f4c95d"></rect>
+        <rect x="9" y="11" width="1" height="1" fill="#f4c95d"></rect>
+        <g class="leg leg-l"><rect x="5" y="14" width="3" height="4" fill="#2c3e6b"></rect><rect x="5" y="18" width="3" height="2" fill="#5a3a22"></rect></g>
+        <g class="leg leg-r"><rect x="9" y="14" width="3" height="4" fill="#2c3e6b"></rect><rect x="9" y="18" width="3" height="2" fill="#5a3a22"></rect></g>
+      </svg>
+      <svg class="char-svg her-svg" viewBox="0 0 16 22" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="0" width="2" height="2" fill="#f4c95d"></rect>
+        <rect x="9" y="0" width="2" height="2" fill="#f4c95d"></rect>
+        <rect x="7" y="1" width="2" height="1" fill="#f4c95d"></rect>
+        <rect x="4" y="2" width="9" height="1" fill="#f4c95d"></rect>
+        <rect x="3" y="3" width="11" height="2" fill="#5c3a21"></rect>
+        <rect x="3" y="5" width="2" height="9" fill="#5c3a21"></rect>
+        <rect x="13" y="5" width="2" height="9" fill="#5c3a21"></rect>
+        <rect x="4" y="5" width="1" height="6" fill="#5c3a21"></rect>
+        <rect x="13" y="5" width="1" height="6" fill="#5c3a21"></rect>
+        <rect x="5" y="5" width="8" height="6" fill="#f2c39a"></rect>
+        <rect x="10" y="7" width="1" height="1" fill="#2f2650"></rect>
+        <rect x="7" y="9" width="3" height="1" fill="#c9788a"></rect>
+        <rect x="5" y="11" width="8" height="4" fill="#b98fd1"></rect>
+        <rect x="3" y="11" width="2" height="4" fill="#b98fd1"></rect>
+        <rect x="13" y="11" width="2" height="4" fill="#b98fd1"></rect>
+        <rect x="3" y="15" width="2" height="2" fill="#f2c39a"></rect>
+        <rect x="13" y="15" width="2" height="2" fill="#f2c39a"></rect>
+        <polygon class="dress" points="4,15 14,15 16,22 0,22" fill="#7a4a95"></polygon>
+        <rect x="6" y="21" width="2" height="1" fill="#5a3a22"></rect>
+        <rect x="9" y="21" width="2" height="1" fill="#5a3a22"></rect>
+      </svg>
+    </div>
+
+
+    <div class="hud-top">
+      <div class="love-meter">❤️ <div class="bar"><div class="fill" id="loveFill"></div></div> <span id="loveCount">0</span></div>
+    </div>
+    <div class="chapter-tag" id="chapterTag">Walk right to begin →</div>
+    <button class="icon-btn btn-pause" id="pauseBtn">⏸</button>
+    <button class="icon-btn btn-map" id="mapBtn">🗺️</button>
+    <button class="icon-btn btn-mute" id="muteBtnWorld">🔊</button>
+
+    <div class="touch-controls">
+      <div class="dpad">
+        <div class="tbtn" id="btnLeft">◀</div>
+        <div class="tbtn" id="btnRight">▶</div>
+      </div>
+      <div class="jump-btn"><div class="tbtn" id="btnJump">⤒</div></div>
+    </div>
+  </div>
+
+  <!-- PUNCTURE VIGNETTE -->
+  <div class="vignette-overlay" id="punctureOverlay">
+    <div class="vignette-box">
+      <div class="v-emoji">🛞💥</div>
+      <p id="punctureText">Oh no — flat tire, right in the middle of the road...</p>
+    </div>
+  </div>
+
+  <!-- MEMORY CARD -->
+  <div class="overlay" id="memoryOverlay">
+    <div class="memory-card" id="memoryCardBody"></div>
+  </div>
+
+  <!-- GIFT OVERLAY -->
+  <div class="overlay" id="giftOverlay">
+    <div class="gift-popup" id="giftBody"></div>
+  </div>
+
+  <!-- PAUSE / CHAPTER SELECT -->
+  <div class="overlay" id="pauseOverlay">
+    <div class="pause-panel">
+      <h3 class="pixel">PAUSED</h3>
+      <button class="menu-btn" id="resumeBtn">Resume</button>
+      <button class="menu-btn" id="resetBtn">Reset Progress</button>
+      <button class="menu-btn" id="fsBtn">Toggle Fullscreen</button>
+      <div id="chapterList" style="margin-top:14px;"></div>
+      <button class="menu-btn" id="closePauseBtn" style="margin-top:6px;">Close</button>
+      <div id="exportRow" style="display:none;margin-top:10px;">
+        <button class="menu-btn" id="exportBtn">⬇ Save Game With Added Photos</button>
+      </div>
+      <div style="margin-top:14px;">
+        <span id="creatorLink" style="font-size:10px;opacity:.5;cursor:pointer;">✎ creator access</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATOR PASSCODE -->
+  <div class="overlay" id="passOverlay">
+    <div class="pause-panel">
+      <h3 class="pixel">CREATOR ACCESS</h3>
+      <input type="password" id="passInput" placeholder="Enter passcode" style="width:100%;padding:10px;border-radius:8px;border:none;margin-bottom:10px;font-size:14px;">
+      <button class="menu-btn" id="passSubmitBtn">Unlock</button>
+      <button class="menu-btn" id="passCancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- LIGHTBOX VIEWER -->
+  <div class="overlay" id="lightboxOverlay">
+    <div style="max-width:92vw;max-height:88vh;display:flex;flex-direction:column;align-items:center;gap:10px;">
+      <div id="lightboxMediaWrap" style="max-width:92vw;max-height:78vh;"></div>
+      <button class="small-btn" id="lightboxCloseBtn">✕ Close</button>
+    </div>
+  </div>
+
+  <!-- SURPRISE 100% -->
+  <div class="surprise-overlay" id="surpriseOverlay">
+    <div class="surprise-box">
+      <h2>💗 LOVE METER FULL 💗</h2>
+      <p id="surpriseMsg"></p>
+      <button class="small-btn" id="closeSurpriseBtn">Continue</button>
+    </div>
+  </div>
+
+  <!-- ENDING -->
+  <div class="scene" id="scene-ending">
+    <div class="stars" id="starsField"></div>
+    <div id="fireworksField"></div>
+    <div class="ending-content">
+      <div class="pixel" style="font-size:clamp(16px,5vw,24px);color:var(--gold);text-shadow:3px 3px 0 var(--brick-dark);">TO BE CONTINUED</div>
+      <div class="ending-dialogue" id="endingDialogue"></div>
+    </div>
+    <div class="credits" id="credits"></div>
+  </div>
+
+  <!-- CONFIRM RESET -->
+  <div class="overlay" id="confirmOverlay">
+    <div class="pause-panel">
+      <h3 class="pixel">RESET PROGRESS?</h3>
+      <p style="font-size:12px;margin-bottom:14px;line-height:1.5;">This resets your walk progress and hearts collected. Photos and videos you've added will NOT be deleted.</p>
+      <button class="menu-btn" id="confirmYesBtn">Yes, Reset</button>
+      <button class="menu-btn" id="confirmNoBtn">Cancel</button>
+    </div>
+  </div>
+
+  <audio id="bgAudio" loop=""></audio>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* =============================================================================
+   CUSTOMIZE HERE — names + every memory's story text.
+   Photos/videos don't need to be added here: open the game and use the
+   "Add Photos" / "Add Video" buttons inside each memory card. They're saved
+   automatically to this browser/account so they'll still be there next time.
+   To add a brand-new memory later, copy one of the STORY objects, give it a
+   unique id, and place it in the array in the order it happened — the flag
+   position (flagX) controls how far you have to walk to reach it.
+   ============================================================================= */
+
+const NAMES = { player: "You", partner: "Her" }; // <-- put your real names here
+
+// Set your own secret word/number here. Only YOU should know this.
+// Whoever doesn't enter this correctly only ever sees view-only mode (no upload buttons).
+const CREATOR_PASSCODE = "ourstory";
+
+// Captured once, before anything on the page changes — used by the "Save Game
+// With Added Photos" export feature so the file you send her never contains
+// upload buttons or your passcode dialog in an unlocked state.
+const PRISTINE_HTML = document.documentElement.outerHTML;
+
+const MUSIC = { }; // optional: e.g. MUSIC.world = "mysong.mp3" (leave blank for silence)
+
+const STORY = [
+  {
+    id: "start", date: "6 January", title: "Where It All Started", theme: "dawn",
+    flagX: 1100,
+    story: `This was the day ashi when we first said to said other in a weird way but the best possible way ig and that too in a bus in a random convo and you said "Toh abh kya kalse good morning bhejne ka rooz?"`,
+    funnyQuote: "Yehi bola tha apan ne Mai tujhe pasand hu? TU BATA???",
+    hiddenMessage: "I still think about that day and this is the best day of my life",
+    decor: ["🌅","🌸","🌸","☁️"]
+  },
+  {
+    id: "firstdate", date: "11 January", title: "First Date — The Beach Ride", theme: "beach",
+    flagX: 2900,
+    puncture: { atX: 2100, text: "Flat tire, halfway to the beach. Panic! until you just laughed and said it's okay." },
+    story: `This was our first date ashiiiii<3 where we went on a first date and our tire was punctured im so sorry for that and i said said sorry so many times but when you didnt paniced and said its okay and the weird time to say I LOVE YOU for the first time was really amazing and weird at the same time cutu`,
+    funnyQuote: "\"you said i love you near the mechanic this is memorable",
+    hiddenMessage: "That's when I first saw how you handle chaos calmly, and with me.",
+    decor: ["🏖️","🌊","🌴","🛵","🐚"]
+  },
+  {
+    id: "distance", date: "Long Distance", title: "Miles Apart — Pune", theme: "rain",
+    flagX: 4500,
+    story: `Then you moved to Pune. Two months of missing each other and those video calls before going to sleep are my best memory. This was a bit sad thing happened to us but we went through it ashiiii and we met every weekend ashi this was the best thing we did during our long distance.`,
+    funnyQuote: " \"i miss you\" these words were constant when we spoke to each other everyday",
+    hiddenMessage: "Missing you taught me how much space you actually take up in my life.",
+    decor: ["🌧️","🚉","📱","☁️"]
+  },
+  {
+    id: "birthday", date: "Mumbai → Pune", title: "The Surprise Visit & Your Birthday", theme: "warm",
+    flagX: 6100,
+    story: `I couldn't stay away and took the trip from Mumbai to Pune just to see you. We ate donuts at your birthday together, and for one whole day the distance didn't exist at all. Just us, donut, and being properly happy.`,
+    funnyQuote: "You said \"YOU ARE THE BEST BOYFRIEND\" this i still remember",
+    hiddenMessage: "The first time we met it was raining and that is my best memory for life cutuuuuu",
+    decor: ["🎂","🎉","🕯️","🎈"]
+  },
+  {
+    id: "office", date: "Her Mumbai Job", title: "Coffee & Sunset At our Office", theme: "sunset",
+    flagX: 7700,
+    story: `You finally moved to Mumbai, and I got to spend a whole day with you at your office and that bad coffee that tasted great because you were there, and watching the sunset together from a place that had nothing to do with romance until we made it that way.`,
+    funnyQuote: "Eating sordough with you is the best memory in office",
+    hiddenMessage: "I still love coming to office just because i get to meet you",
+    decor: ["☕","🏢","🌇"]
+  },
+  {
+    id: "ganesh", date: "Ganesh Festival", title: "Streets Of Mumbai, All Night", theme: "night",
+    flagX: 9300,
+    story: `We wandered the streets of Mumbai during Ganesh festival, pandal to pandal, lights everywhere, the whole city buzzing. We stayed out until early morning, just roaming our scooty it was your first time watching Mumbai at night and then we went to a small beach and had the best time of ours right?`,
+    funnyQuote: "We always make hi kids video and this i will show to our kids",
+    hiddenMessage: "That was the best night i spent with you cutu",
+    decor: ["🎊","🪔","✨","🎶"]
+  },
+  {
+    id: "diwali", date: "Diwali", title: "Our First Diwali Together", theme: "night",
+    flagX: 10900,
+    story: `Our first Diwali as an \"us.\" we literally met for few moment but that was my best diwali since i got to spend time with you cutu and we ate at blue tokai where you ate all the sordough bread but its okay bb`,
+    funnyQuote: "I was fully drenched in rains but still managed to reach your place",
+    hiddenMessage: "Every Diwali from now on, I'll be comparing it to this one.",
+    decor: ["🪔","🎆","🎇","✨"]
+  },
+  {
+    id: "goa", date: "The Trip", title: "Goa — Beaches & Kayaks", theme: "beach",
+    flagX: 12500,
+    story: `Our Goa trip. Beaches, kayaking, way too much good food, and you with me 24/7 was the best part. I got to cuddle w you the whole night. We sang some songs had fun went good places and did so much this was so good i cant tell you and you are the best ashi i love you`,
+    funnyQuote: "Kayaking was the best memory right ashi?",
+    hiddenMessage: "This is what I want more of just us, also we are going to Italy okay.",
+    decor: ["🏖️","🚣","🥥","🌊","🍹"]
+  }
+];
+
+const EPILOGUE_X = 13800; // final castle flag beyond the last memory
+
+/* ============================= END CUSTOMIZATION ============================= */
+
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+function showScene(id){ $$('.scene').forEach(s=>s.classList.remove('active')); $('#'+id).classList.add('active'); }
+
+// ---------------- STATE ----------------
+const HEARTS_TARGET = 60;
+let state = { hearts:0, visited:{}, surpriseShown:false, muted:false, playerX:0 };
+
+async function saveProgress(){
+  try{ if(window.storage) await window.storage.set('adv_progress', JSON.stringify(state), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    if(window.storage){
+      const r = await window.storage.get('adv_progress', false);
+      if(r && r.value) state = Object.assign(state, JSON.parse(r.value));
+    }
+  }catch(e){}
+  refreshHUD();
+}
+
+// ---------------- AUDIO ----------------
+const bgAudio = $('#bgAudio');
+function playMusic(key){
+  const src = MUSIC[key];
+  if(src){ bgAudio.src = src; bgAudio.muted = state.muted; bgAudio.play().catch(()=>{}); }
+  else bgAudio.pause();
+}
+function toggleMute(){
+  state.muted = !state.muted; bgAudio.muted = state.muted;
+  $$('.btn-mute').forEach(b=>b.textContent = state.muted?'🔇':'🔊');
+  saveProgress();
+}
+$$('.btn-mute').forEach(b=>b.addEventListener('click', toggleMute));
+
+function refreshHUD(){
+  const pct = Math.min(100, Math.round((state.hearts/HEARTS_TARGET)*100));
+  $('#loveFill').style.width = pct+'%';
+  $('#loveCount').textContent = state.hearts;
+}
+function addHearts(n){
+  state.hearts += n; refreshHUD(); saveProgress();
+  if(state.hearts>=HEARTS_TARGET && !state.surpriseShown){
+    state.surpriseShown = true; showSurprise();
+  }
+}
+function showSurprise(){
+  const ov = $('#surpriseOverlay');
+  $('#surpriseMsg').textContent = `${NAMES.player} collected every heart along the way, ${NAMES.partner}. That's every single day, actually.`;
+  ov.classList.add('show');
+  for(let i=0;i<40;i++){
+    const c = document.createElement('div'); c.className='confetti-piece';
+    c.style.left = Math.random()*100+'%';
+    c.style.background = ['#ef6f8e','#f4c95d','#7a5cff','#6fbf6a'][Math.floor(Math.random()*4)];
+    c.style.animationDuration = (2+Math.random()*2)+'s';
+    ov.appendChild(c); setTimeout(()=>c.remove(),4500);
+  }
+  saveProgress();
+}
+$('#closeSurpriseBtn').addEventListener('click', ()=>$('#surpriseOverlay').classList.remove('show'));
+
+// ---------------- WORLD BUILD ----------------
+const worldFar = $('#worldFar');
+const worldNear = $('#worldNear');
+const SEG_GAP_HILLS = 900;
+let WORLD_WIDTH = EPILOGUE_X + 1200;
+
+function buildWorld(){
+  worldFar.innerHTML=''; worldNear.innerHTML='';
+  worldFar.style.width = WORLD_WIDTH+'px';
+  worldNear.style.width = WORLD_WIDTH+'px';
+
+  // ground band spans entire world
+  const ground = document.createElement('div');
+  ground.className='ground-band'; ground.style.width = WORLD_WIDTH+'px';
+  worldNear.appendChild(ground);
+
+  // hills + clouds scattered along far layer
+  for(let x=200; x<WORLD_WIDTH; x+=SEG_GAP_HILLS){
+    const h = document.createElement('div');
+    h.className='hill';
+    const w = 260+Math.random()*160, hgt = 90+Math.random()*70;
+    h.style.width=w+'px'; h.style.height=hgt+'px'; h.style.left=x+'px';
+    h.style.background = Math.random()>.5 ? 'var(--grass)' : 'var(--grass-dark)';
+    worldFar.appendChild(h);
+
+    const c = document.createElement('div');
+    c.className='cloud-world';
+    const cw=70+Math.random()*50, ch=26+Math.random()*10;
+    c.style.width=cw+'px'; c.style.height=ch+'px';
+    c.style.left=(x+150+Math.random()*300)+'px'; c.style.top=(10+Math.random()*60)+'px';
+    worldFar.appendChild(c);
+  }
+
+  // per-memory decor + flags + hearts
+  let prevX = 0;
+  STORY.forEach((m,i)=>{
+    const segStart = prevX, segEnd = m.flagX;
+    // decor emojis scattered across this segment
+    (m.decor||[]).forEach((emo,di)=>{
+      const d = document.createElement('div');
+      d.className='decor'+(Math.random()>.5?' small':'');
+      d.textContent = emo;
+      d.style.left = (segStart + 100 + (di*(segEnd-segStart-200)/(m.decor.length||1)) + Math.random()*60) + 'px';
+      d.style.bottom = 'calc(14% + ' + (Math.random()*4) + 'px)';
+      worldNear.appendChild(d);
+    });
+    // hearts scattered
+    const heartCount = 5;
+    for(let j=0;j<heartCount;j++){
+      const hx = segStart + 150 + Math.random()*(segEnd-segStart-300);
+      const h = document.createElement('div');
+      h.className='collectible'; h.textContent='❤️';
+      h.style.left = hx+'px';
+      h.style.bottom = (20+Math.random()*14)+'%';
+      h.dataset.collected='0';
+      h.addEventListener('click', ()=>{
+        if(h.classList.contains('gone')) return;
+        h.classList.add('gone'); addHearts(1);
+      });
+      worldNear.appendChild(h);
+    }
+    // one gift collectible per memory
+    const gx = segStart + 150 + Math.random()*(segEnd-segStart-300);
+    const gEmoji = ["💐","🍰","💌","🎁","☕","🎇","🥥","💝"][i%8];
+    const gift = document.createElement('div');
+    gift.className='collectible'; gift.textContent=gEmoji;
+    gift.style.left=gx+'px'; gift.style.bottom='34%';
+    gift.addEventListener('click', ()=>{
+      if(gift.classList.contains('gone')) return;
+      gift.classList.add('gone');
+      openGift(m, gEmoji);
+    });
+    worldNear.appendChild(gift);
+
+    // flag
+    const flag = document.createElement('div');
+    flag.className='flag'+(state.visited[m.id]?' visited':'');
+    flag.style.left = m.flagX+'px';
+    flag.dataset.id = m.id;
+    flag.innerHTML = `<div class="pole"></div><div class="banner">🚩</div><div class="flabel">${m.date}</div>`;
+    flag.addEventListener('click', ()=> openMemoryCard(m));
+    worldNear.appendChild(flag);
+
+    prevX = m.flagX + 300;
+  });
+
+  // epilogue castle flag
+  const castle = document.createElement('div');
+  castle.className='flag castle-flag';
+  castle.style.left = EPILOGUE_X+'px';
+  castle.innerHTML = `<div class="pole" style="height:160px;"></div><div class="banner" style="bottom:auto;">🏰</div><div class="flabel">To Be Continued</div>`;
+  castle.addEventListener('click', goToEnding);
+  worldNear.appendChild(castle);
+}
+
+// ---------------- PLAYER MOVEMENT ----------------
+const player = $('#player');
+const PLAYER_SCREEN_X = 130;
+let playerX = 0;
+let facing = 1;
+let keys = {left:false,right:false};
+let frozen = false;
+const SPEED = 4.2;
+let currentSegmentIndex = -1;
+
+function updateCamera(){
+  const camNear = PLAYER_SCREEN_X - playerX;
+  const camFar = PLAYER_SCREEN_X - playerX*0.4;
+  worldNear.style.transform = `translateX(${camNear}px)`;
+  worldFar.style.transform = `translateX(${camFar}px)`;
+  player.style.left = PLAYER_SCREEN_X+'px';
+}
+
+function updateTheme(){
+  let idx = STORY.findIndex(m => playerX < m.flagX + 150);
+  if(idx===-1) idx = STORY.length-1;
+  if(idx!==currentSegmentIndex){
+    currentSegmentIndex = idx;
+    const m = STORY[idx];
+    $('#chapterTag').textContent = `${m.date} — ${m.title}`;
+    const tint = $('#tintLayer');
+    tint.className = 'tint';
+    const rain = $('#rainLayer');
+    rain.className = 'rain-layer';
+    if(m.theme==='rain'){ tint.classList.add('rain','on'); rain.classList.add('on'); spawnRain(); }
+    else if(m.theme==='night'){ tint.classList.add('night','on'); }
+    else if(m.theme==='sunset'){ tint.classList.add('sunset','on'); }
+    else if(m.theme==='warm'){ tint.classList.add('warm','on'); }
+    else if(m.theme==='beach'){ tint.classList.add('beach','on'); }
+    else { tint.classList.add('on'); tint.style.opacity=0; }
+  }
+}
+function spawnRain(){
+  const rain = $('#rainLayer');
+  if(rain.childElementCount>0) return;
+  for(let i=0;i<40;i++){
+    const d = document.createElement('div'); d.className='drop';
+    d.style.left = Math.random()*100+'%';
+    d.style.animationDuration = (0.6+Math.random()*0.5)+'s';
+    d.style.animationDelay = (Math.random()*1)+'s';
+    rain.appendChild(d);
+  }
+}
+
+function checkTriggers(){
+  STORY.forEach(m=>{
+    if(m.puncture && !state.visited['puncture_'+m.id] && Math.abs(playerX - m.puncture.atX) < 20){
+      state.visited['puncture_'+m.id] = true;
+      triggerPuncture(m);
+    }
+    if(!state.visited[m.id] && Math.abs(playerX - m.flagX) < 30){
+      openMemoryCard(m);
+    }
+  });
+  if(!state.visited['__epilogue'] && Math.abs(playerX - EPILOGUE_X) < 30){
+    state.visited['__epilogue'] = true;
+    goToEnding();
+  }
+}
+
+function triggerPuncture(m){
+  frozen = true;
+  $('#punctureText').textContent = m.puncture.text;
+  $('#punctureOverlay').classList.add('show');
+  setTimeout(()=>{
+    $('#punctureOverlay').classList.remove('show');
+    frozen = false;
+    saveProgress();
+  }, 3200);
+}
+
+function gameLoop(){
+  if(!frozen){
+    if(keys.right){ playerX = Math.min(WORLD_WIDTH-100, playerX+SPEED); facing=1; player.classList.add('walk'); }
+    else if(keys.left){ playerX = Math.max(0, playerX-SPEED); facing=-1; player.classList.add('walk'); }
+    else { player.classList.remove('walk'); }
+    player.style.setProperty('--dir', facing);
+    updateCamera();
+    updateTheme();
+    checkTriggers();
+    state.playerX = playerX;
+  }
+  requestAnimationFrame(gameLoop);
+}
+
+function jump(){
+  if(frozen) return;
+  player.classList.remove('jump'); void player.offsetWidth; player.classList.add('jump');
+}
+
+document.addEventListener('keydown', e=>{
+  if(!$('#scene-world').classList.contains('active')) return;
+  if(e.key==='ArrowRight'||e.key==='d') keys.right=true;
+  if(e.key==='ArrowLeft'||e.key==='a') keys.left=true;
+  if(e.key==='ArrowUp'||e.key===' '||e.key==='w'){ jump(); e.preventDefault(); }
+});
+document.addEventListener('keyup', e=>{
+  if(e.key==='ArrowRight'||e.key==='d') keys.right=false;
+  if(e.key==='ArrowLeft'||e.key==='a') keys.left=false;
+});
+function bindHold(el, onDown, onUp){
+  el.addEventListener('mousedown', onDown); el.addEventListener('touchstart', e=>{e.preventDefault();onDown();});
+  el.addEventListener('mouseup', onUp); el.addEventListener('mouseleave', onUp);
+  el.addEventListener('touchend', e=>{e.preventDefault();onUp();});
+}
+bindHold($('#btnRight'), ()=>keys.right=true, ()=>keys.right=false);
+bindHold($('#btnLeft'), ()=>keys.left=true, ()=>keys.left=false);
+$('#btnJump').addEventListener('click', jump);
+$('#btnJump').addEventListener('touchstart', e=>{e.preventDefault(); jump();});
+
+// ---------------- MEDIA UPLOAD (photos/videos persisted via window.storage + export) ----------------
+let creatorMode = false;
+const mediaCache = {}; // { memoryId: {photos:[dataURL], videos:[dataURL]} }
+const EMBEDDED_MEDIA = (window.__EMBEDDED_MEDIA || {}); // baked into an exported copy of this file
+
+function fileToDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = ()=>resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+async function loadMediaFor(memoryId){
+  if(mediaCache[memoryId]) return mediaCache[memoryId];
+  const result = {photos:[], videos:[]};
+  if(EMBEDDED_MEDIA[memoryId]){
+    (EMBEDDED_MEDIA[memoryId].photos||[]).forEach(url=> result.photos.push({url, key:null}));
+    (EMBEDDED_MEDIA[memoryId].videos||[]).forEach(url=> result.videos.push({url, key:null}));
+  }
+  try{
+    if(window.storage){
+      const list = await window.storage.list('media:'+memoryId+':', false);
+      if(list && list.keys){
+        for(const key of list.keys){
+          try{
+            const r = await window.storage.get(key, false);
+            if(r && r.value){
+              if(key.includes(':photo:')) result.photos.push({url:r.value, key});
+              else if(key.includes(':video:')) result.videos.push({url:r.value, key});
+            }
+          }catch(e){}
+        }
+      }
+    }
+  }catch(e){}
+  mediaCache[memoryId] = result;
+  return result;
+}
+
+async function saveMedia(memoryId, kind, dataURL){
+  const key = `media:${memoryId}:${kind}:${Date.now()}-${Math.floor(Math.random()*9999)}`;
+  try{
+    if(window.storage){
+      const res = await window.storage.set(key, dataURL, false);
+      return res ? key : null;
+    }
+  }catch(e){ return null; }
+  return null;
+}
+
+async function deleteMediaItem(memoryId, kind, index){
+  const media = mediaCache[memoryId];
+  if(!media) return;
+  const arr = kind==='photo' ? media.photos : media.videos;
+  const item = arr[index];
+  if(!item) return;
+  if(item.key){
+    try{ if(window.storage) await window.storage.delete(item.key, false); }catch(e){}
+  }
+  arr.splice(index,1);
+  renderMediaGrid($('#mediaGrid_'+memoryId), media);
+  const note = $('#saveNote_'+memoryId);
+  if(note) note.textContent = item.key ? 'Removed ✓' : 'Removed for now — export again to make the removal permanent.';
+}
+
+function renderMediaGrid(container, media, memoryId){
+  container.innerHTML='';
+  if(!media.photos.length && !media.videos.length){
+    container.innerHTML = `<div class="media-empty">${creatorMode ? 'No photos or videos yet — add some below 📷' : 'No photos or videos added yet 📷'}</div>`;
+    return;
+  }
+  media.photos.forEach((p,i)=>{
+    const it = document.createElement('div'); it.className='media-item';
+    it.innerHTML = `<img src="${p.url}">${creatorMode ? '<div class="media-remove">✕</div>' : ''}`;
+    it.querySelector('img').addEventListener('click', ()=> openLightbox('photo', p.url));
+    if(creatorMode){
+      it.querySelector('.media-remove').addEventListener('click', (e)=>{ e.stopPropagation(); deleteMediaItem(memoryId,'photo',i); });
+    }
+    container.appendChild(it);
+  });
+  media.videos.forEach((v,i)=>{
+    const it = document.createElement('div'); it.className='media-item';
+    it.innerHTML = `<video src="${v.url}" preload="metadata" muted playsinline></video>${creatorMode ? '<div class="media-remove">✕</div>' : ''}`;
+    it.querySelector('video').addEventListener('click', ()=> openLightbox('video', v.url));
+    if(creatorMode){
+      it.querySelector('.media-remove').addEventListener('click', (e)=>{ e.stopPropagation(); deleteMediaItem(memoryId,'video',i); });
+    }
+    container.appendChild(it);
+  });
+}
+
+function openLightbox(kind, src){
+  const wrap = $('#lightboxMediaWrap');
+  wrap.innerHTML = kind==='photo' ? `<img src="${src}">` : `<video src="${src}" controls autoplay playsinline></video>`;
+  $('#lightboxOverlay').classList.add('show');
+}
+$('#lightboxCloseBtn').addEventListener('click', ()=>{
+  $('#lightboxOverlay').classList.remove('show');
+  $('#lightboxMediaWrap').innerHTML='';
+});
+
+// ---------------- MEMORY CARD ----------------
+async function openMemoryCard(m){
+  state.visited[m.id] = true;
+  frozen = true;
+  saveProgress();
+  const media = await loadMediaFor(m.id);
+  $('#memoryCardBody').innerHTML = `
+    <div class="m-date">${m.date}</div>
+    <div class="m-title">${m.title}</div>
+    <div class="media-grid" id="mediaGrid_${m.id}"></div>
+    ${creatorMode ? `
+    <div class="upload-row">
+      <label class="upload-btn">📷 Add Photos<input type="file" accept="image/*" multiple class="hidden-file" id="photoInput_${m.id}"></label>
+      <label class="upload-btn">🎥 Add Video<input type="file" accept="video/*" class="hidden-file" id="videoInput_${m.id}"></label>
+    </div>
+    <div class="save-note" id="saveNote_${m.id}"></div>` : ''}
+    <div class="m-story">${m.story}</div>
+    ${m.funnyQuote ? `<span class="m-tag">😄 ${m.funnyQuote}</span>` : ''}
+    <div class="m-story" style="background:#fff2f6;border:2px dashed var(--heart-dark);border-radius:10px;padding:10px;font-style:italic;margin-top:10px;">💌 ${m.hiddenMessage||''}</div>
+    <button class="continue-btn" id="memContinueBtn">Continue ▶</button>
+  `;
+  renderMediaGrid($('#mediaGrid_'+m.id), media, m.id);
+
+  if(creatorMode){
+    $('#photoInput_'+m.id).addEventListener('change', async (e)=>{
+      const files = Array.from(e.target.files);
+      const note = $('#saveNote_'+m.id);
+      note.textContent = 'Saving...';
+      for(const f of files){
+        try{
+          const durl = await fileToDataURL(f);
+          const key = await saveMedia(m.id, 'photo', durl);
+          media.photos.push({url:durl, key});
+          if(!key) note.textContent = 'Added — use "Save Game With Added Photos" in the pause menu to keep it permanently.';
+        }catch(err){}
+      }
+      if(!note.textContent.includes('permanently')) note.textContent = 'Added ✓ (remember to export before sending the file)';
+      renderMediaGrid($('#mediaGrid_'+m.id), media, m.id);
+    });
+    $('#videoInput_'+m.id).addEventListener('change', async (e)=>{
+      const f = e.target.files[0];
+      if(!f) return;
+      const note = $('#saveNote_'+m.id);
+      note.textContent = 'Loading video...';
+      try{
+        // Blob URL = reliable, instant playback regardless of file size.
+        const blobUrl = URL.createObjectURL(f);
+        media.videos.push({url:blobUrl, key:null});
+        renderMediaGrid($('#mediaGrid_'+m.id), media, m.id);
+
+        // Only attempt permanent storage if the file is small enough to fit
+        // (large videos as base64 text are unreliable/too big to save or embed).
+        const MAX_PERSIST_BYTES = 4 * 1024 * 1024; // ~4MB
+        if(f.size <= MAX_PERSIST_BYTES){
+          note.textContent = 'Saving...';
+          const durl = await fileToDataURL(f);
+          const key = await saveMedia(m.id, 'video', durl);
+          const idx = media.videos.findIndex(v=>v.url===blobUrl);
+          if(idx>-1) media.videos[idx] = {url:durl, key};
+          renderMediaGrid($('#mediaGrid_'+m.id), media, m.id);
+          note.textContent = key ? 'Saved ✓ — will survive reloads and exports.' : 'Playable now, but could not be saved permanently.';
+        } else {
+          note.textContent = `Playable now (${(f.size/1024/1024).toFixed(1)}MB) but too large to save permanently or bake into an exported file. Keep videos under ~4MB to persist — a short trimmed clip usually works well.`;
+        }
+      }catch(err){ note.textContent = 'Could not read that video file.'; }
+    });
+  }
+
+  $('#memoryOverlay').classList.add('show');
+  $('#memContinueBtn').onclick = ()=>{
+    $('#memoryOverlay').classList.remove('show');
+    frozen = false;
+    document.querySelectorAll('.flag').forEach(f=>{ if(f.dataset.id===m.id) f.classList.add('visited'); });
+  };
+}
+
+function openGift(m, emoji){
+  const gifts = {
+    "💐":"The best day of my life.","🍰":"First date incoming.","💌":"A little love note. my best girl",
+    "🎁":"i love you my cutu.","☕":"Terrible office coffee, made better by you.","🎇":"A spark from our first Diwali.",
+    "🥥":"A taste of Goa.","💝":"Just because."
+  };
+  $('#giftBody').innerHTML = `<div class="g-emoji">${emoji}</div><h3 class="pixel" style="font-size:13px;margin:10px 0;">${m.title}</h3><p>${gifts[emoji]||"A little something for you."}</p><button class="continue-btn" id="closeGiftBtn">Sweet!</button>`;
+  $('#giftOverlay').classList.add('show');
+  $('#closeGiftBtn').onclick = ()=>$('#giftOverlay').classList.remove('show');
+}
+
+// ---------------- PAUSE / CHAPTER SELECT ----------------
+function buildChapterList(){
+  const el = $('#chapterList');
+  el.innerHTML='';
+  STORY.forEach(m=>{
+    const row = document.createElement('div');
+    row.className='chapter-row';
+    row.innerHTML = `<div class="cbadge">${state.visited[m.id]?'💖':'🚩'}</div><div><div class="ctitle">${m.title}</div><div class="cdate">${m.date}</div></div>`;
+    row.addEventListener('click', ()=>{
+      playerX = Math.max(0, m.flagX - 250);
+      updateCamera(); updateTheme();
+      closePause();
+    });
+    el.appendChild(row);
+  });
+}
+function openPause(){ buildChapterList(); $('#pauseOverlay').classList.add('show'); frozen=true; }
+function closePause(){ $('#pauseOverlay').classList.remove('show'); frozen=false; }
+$('#pauseBtn').addEventListener('click', openPause);
+$('#mapBtn').addEventListener('click', openPause);
+$('#resumeBtn').addEventListener('click', closePause);
+$('#closePauseBtn').addEventListener('click', closePause);
+$('#resetBtn').addEventListener('click', ()=>{
+  $('#confirmOverlay').classList.add('show');
+});
+$('#confirmNoBtn').addEventListener('click', ()=>{
+  $('#confirmOverlay').classList.remove('show');
+});
+$('#confirmYesBtn').addEventListener('click', async ()=>{
+  state = { hearts:0, visited:{}, surpriseShown:false, muted:state.muted, playerX:0 };
+  playerX = 0;
+  currentSegmentIndex = -1;
+  await saveProgress(); refreshHUD(); buildWorld(); updateCamera(); updateTheme();
+  $('#confirmOverlay').classList.remove('show');
+  closePause();
+});
+$('#fsBtn').addEventListener('click', ()=>{
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen().catch(()=>{});
+});
+
+// ---------------- CREATOR MODE UNLOCK ----------------
+function updateCreatorUI(){
+  $('#exportRow').style.display = creatorMode ? 'block' : 'none';
+  $('#creatorLink').textContent = creatorMode ? '✎ creator mode on' : '✎ creator access';
+}
+$('#creatorLink').addEventListener('click', ()=>{
+  if(creatorMode){ creatorMode = false; updateCreatorUI(); return; }
+  $('#passInput').value='';
+  $('#passOverlay').classList.add('show');
+});
+$('#passCancelBtn').addEventListener('click', ()=> $('#passOverlay').classList.remove('show'));
+$('#passSubmitBtn').addEventListener('click', ()=>{
+  if($('#passInput').value === CREATOR_PASSCODE){
+    creatorMode = true;
+    updateCreatorUI();
+    $('#passOverlay').classList.remove('show');
+  } else {
+    $('#passInput').value='';
+    $('#passInput').placeholder='Wrong passcode, try again';
+  }
+});
+
+// ---------------- EXPORT (bake uploaded media into a shareable copy) ----------------
+async function exportGameFile(){
+  for(const m of STORY){ await loadMediaFor(m.id); }
+  const plainMedia = {};
+  let skippedCount = 0;
+  Object.keys(mediaCache).forEach(id=>{
+    const photos = mediaCache[id].photos.filter(p=>!p.url.startsWith('blob:')).map(p=>p.url);
+    const videos = mediaCache[id].videos.filter(v=>{
+      if(v.url.startsWith('blob:')){ skippedCount++; return false; }
+      return true;
+    }).map(v=>v.url);
+    plainMedia[id] = { photos, videos };
+  });
+  const mediaBlock = JSON.stringify(plainMedia).replace(/</g,'\\u003c');
+  const injected = `<script>window.__EMBEDDED_MEDIA = ${mediaBlock};<\/script>\n</body>`;
+  const finalHtml = PRISTINE_HTML.replace('</body>', injected);
+  const blob = new Blob([finalHtml], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'our-adventure.html';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  if(skippedCount>0){
+    showToast(`${skippedCount} video(s) were too large to bake into the file and were left out of this export. They still play fine for you right now, but she won't see them unless you trim them under ~4MB first.`);
+  }
+}
+function showToast(msg, ms){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(()=> t.classList.remove('show'), ms||5000);
+}
+$('#exportBtn').addEventListener('click', exportGameFile);
+
+// ---------------- ENDING ----------------
+function goToEnding(){
+  showScene('scene-ending');
+  const starsField = $('#starsField'); starsField.innerHTML='';
+  for(let i=0;i<60;i++){
+    const s = document.createElement('div'); s.className='star';
+    s.style.width = s.style.height = (Math.random()*2+1)+'px';
+    s.style.left = Math.random()*100+'%'; s.style.top = Math.random()*70+'%';
+    s.style.animationDelay = (Math.random()*3)+'s';
+    starsField.appendChild(s);
+  }
+  const fw = $('#fireworksField'); fw.innerHTML='';
+  function launch(){
+    const f = document.createElement('div'); f.className='firework';
+    f.style.left=(15+Math.random()*70)+'%'; f.style.top=(15+Math.random()*30)+'%';
+    f.style.background=['#ef6f8e','#f4c95d','#7a5cff','#6fbf6a','#6ec6ff'][Math.floor(Math.random()*5)];
+    fw.appendChild(f); setTimeout(()=>f.remove(),1300);
+  }
+  const fi = setInterval(launch, 500);
+  setTimeout(()=>clearInterval(fi), 15000);
+
+  const dialogueEl = $('#endingDialogue');
+  const lines = [
+    `${NAMES.player}: "Thank you for every memory so far."`,
+    `${NAMES.partner}: "I can't wait to make a thousand more."`,
+    "❤️ Our story keeps going —"
+  ];
+  let li=0; dialogueEl.textContent = lines[0];
+  const li2 = setInterval(()=>{ li++; if(li<lines.length) dialogueEl.textContent=lines[li]; else clearInterval(li2); }, 3000);
+
+  setTimeout(()=>{
+    $('#credits').innerHTML = `A Game By ${NAMES.player}<br>Starring ${NAMES.partner}<br><br>Every Memory: 100% Real<br><br><br>❤️ TO BE CONTINUED ❤️`;
+    $('#credits').classList.add('show');
+  }, 4000);
+}
+
+// ---------------- INIT ----------------
+$('#startBtn').addEventListener('click', async ()=>{
+  showScene('scene-world');
+  buildWorld();
+  playerX = state.playerX || 0;
+  facing = 1;
+  updateCamera(); updateTheme();
+  playMusic('world');
+  gameLoop();
+});
+
+loadProgress();
+updateCreatorUI();
+</script>
+</body>
+</html>
